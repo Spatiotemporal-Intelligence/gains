@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="static/style.css">
     <title>股票涨幅可视化报告</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script defer src="https://cloud.umami.is/script.js" data-website-id="268f3956-b805-41b2-ba45-20312f3a85d9"></script>
@@ -60,6 +60,20 @@
         <div id="charts-container" class="charts-grid">
             <!-- Charts will be dynamically injected via JS -->
         </div>
+
+        <!-- News Feed Section -->
+        <div class="news-container" style="margin: 0 auto 20px auto; background: white; padding: 0; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.03); max-width: 920px;">
+            <div class="chart-title" style="padding: 15px; border-bottom: 1px solid #eee;">
+                <span>财联社电报</span>
+                <span id="news-status" style="float: right; font-size: 12px; color: #999; font-weight: normal;"></span>
+            </div>
+            <div id="telegraph-list" style="overflow-y: auto; height: 600px; padding: 0;">
+                <!-- News items will be injected here -->
+                <div style="padding: 20px; text-align: center; color: #999;">正在加载电报...</div>
+            </div>
+        </div>
+
+        <div class="data-info" id="update-time"></div>
         
         <!-- Expanded Modal -->
         <div id="expanded-modal" class="modal-overlay">
@@ -70,7 +84,6 @@
             </div>
         </div>
 
-        <div class="data-info" id="update-time"></div>
     </div>
     <script src="js/script.js"></script>
 </body>

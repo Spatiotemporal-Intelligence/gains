@@ -1134,9 +1134,83 @@ function hideTooltip() {
     tooltip.style.display = 'none';
 }
 
+// CLS 爬虫逻辑
+let lastNewsId = null;
+// Use a proxy URL if direct access is blocked by CORS, or ensure the environment allows cross-origin requests.
+// Since this is a client-side request to a 3rd party domain.
+const TELEGRAPH_API = 'https://www.cls.cn/nodeapi/telegraphList?rn=30';
+
+async function fetchClsNews() {
+    const statusEl = document.getElementById('news-status');
+    try {
+        if(statusEl) statusEl.textContent = '更新中...';
+        
+        // Add timestamp to prevent caching
+        const url = `${TELEGRAPH_API}&_=${new Date().getTime()}`;
+        const response = await fetch(url);
+        
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const json = await response.json();
+        
+        if (json.data && json.data.roll_data) {
+            renderNews(json.data.roll_data);
+            if(statusEl) {
+                const now = new Date();
+                statusEl.textContent = `最后更新: ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`;
+            }
+        }
+    } catch (e) {
+        console.error("Failed to fetch news:", e);
+        if(statusEl) statusEl.textContent = '更新失败 (CORS/Network)';
+    }
+}
+
+function renderNews(newsList) {
+    const container = document.getElementById('telegraph-list');
+    if (!container) return;
+
+    // Check if we have new data to avoid unnecessary aggressive DOM updates
+    // For simplicity, we re-render if the top ID changes or if it's the first load
+    if (newsList.length === 0) return;
+    
+    const latestId = newsList[0].id;
+    if (lastNewsId === latestId) return; 
+    lastNewsId = latestId;
+
+    let html = '';
+    newsList.forEach(item => {
+        const time = new Date(item.ctime * 1000);
+        const timeStr = `${time.getHours().toString().padStart(2,'0')}:${time.getMinutes().toString().padStart(2,'0')}`;
+        // Color code for importance based on 'level' or 'bold'
+        const isBold = item.level === 'A' || item.bold ? 'font-weight: 700; color: #d0021b;' : 'font-weight: 500; color: #333;';
+        
+        const content = item.content || item.brief || item.title;
+        // Basic highlighting for keywords could be added here
+        
+        html += `
+            <div class="news-item" style="padding: 12px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: flex-start; gap: 12px;">
+                <div class="news-time" style="font-family: 'Roboto Mono', monospace; color: #999; font-size: 14px; min-width: 45px; padding-top: 2px;">${timeStr}</div>
+                <div class="news-content" style="flex: 1; font-size: 15px; line-height: 1.6; ${isBold}">
+                    ${content}
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function initClsCrawler() {
+    // Initial fetch
+    fetchClsNews();
+    // Poll every 1 second
+    setInterval(fetchClsNews, 1000);
+}
+
 // 页面加载完成后执行
 document.addEventListener('DOMContentLoaded', () => {
     initDatePicker(); // Initialize the date picker
     initChart();
     fetchData(); 
+    initClsCrawler();
 });
