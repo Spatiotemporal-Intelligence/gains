@@ -1,0 +1,319 @@
+* {
+    box-sizing: border-box;
+}
+:root {
+    --primary-color: #8884d8;
+    --secondary-color: #82ca9d;
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-color: #333;
+}
+body { font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background-color: var(--bg-color); color: var(--text-color); }
+.container { 
+    max-width: 98%; 
+    margin: 0 auto; 
+    /* background-color: transparent;  Removed white container bg for card look */
+    padding: 0; 
+}
+h1 { 
+    text-align: center; 
+    color: #1a1a1a; 
+    margin-bottom: 25px; 
+    font-weight: 700; 
+    letter-spacing: -0.5px;
+    font-size: 28px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.controls { 
+    margin-bottom: 20px; 
+    display: flex; 
+    gap: 12px; 
+    flex-wrap: wrap; 
+    justify-content: flex-start; 
+    align-items: center; 
+    background: white;
+    padding: 15px 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+/* Modern Button */
+button { 
+    padding: 8px 18px; 
+    font-size: 13px; 
+    font-weight: 600;
+    cursor: pointer; 
+    background-color: white; 
+    color: #444; 
+    border: 1px solid #e0e0e0; 
+    border-radius: 8px; 
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    font-family: 'Inter', sans-serif;
+}
+button:hover { 
+    background-color: #f8f9fa; 
+    border-color: #d0d0d0;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+#btn-play {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(136, 132, 216, 0.3);
+}
+#btn-play:hover {
+    background-color: #7670c9;
+    box-shadow: 0 6px 14px rgba(136, 132, 216, 0.4);
+    transform: translateY(-1px);
+}
+
+.date-picker-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: 15px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #555;
+}
+.date-picker-group input {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 13px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s;
+    background-color: #fff;
+    min-width: 120px;
+}
+.date-picker-group input:focus {
+    border-color: var(--primary-color);
+}
+
+/* Timeline Slider */
+.timeline-container {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 15px;
+    min-width: 200px;
+}
+#timeline {
+    flex-grow: 1;
+    cursor: pointer;
+    height: 6px;
+    border-radius: 3px;
+    accent-color: var(--primary-color);
+}
+
+/* Date Display */
+#current-date {
+    font-family: 'Roboto Mono', monospace;
+    color: var(--primary-color);
+    background: rgba(136, 132, 216, 0.1);
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Grid Layout for Multiple Charts */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    grid-template-rows: repeat(2, 1fr);
+    gap: 15px;
+    /* Use viewport height minus header/controls, but ensure min-height */
+    height: calc(100vh - 160px); 
+    min-height: 900px; 
+    padding-bottom: 5px;
+}
+.chart-container {
+    border: none;
+    border-radius: 16px;
+    padding: 15px;
+    background: var(--card-bg);
+    /* Height is handled by grid row distribution */
+    height: auto; 
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.03);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.chart-container:hover {
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+}
+
+/* Modal Style for Expanded Chart */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 20px; /* Ensure some gutter */
+}
+.modal-content {
+    background: white;
+    width: 100%;
+    max-width: 1200px;
+    height: 90vh; /* Use vh instead of % */
+    max-height: 900px;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden; /* Prevent content overflow */
+}
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: #eee;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    transition: background 0.2s;
+    z-index: 10;
+}
+.modal-close:hover {
+    background: #ddd;
+    color: #000;
+}
+
+.chart-title {
+    text-align: left;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 12px;
+    color: #2d3436;
+    border-left: 4px solid var(--primary-color);
+    padding-left: 12px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
+    cursor: pointer; /* Clickable title */
+}
+.chart-title:hover {
+    color: var(--primary-color);
+}
+
+/* Expand button style */
+.btn-expand {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #999;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+.btn-expand:hover {
+    background: #f0f0f0;
+    color: var(--primary-color);
+}
+.chart-svg-container {
+    flex-grow: 1;
+    position: relative;
+    width: 100%;
+    height: 0; 
+    min-height: 0;
+}
+
+.data-info { text-align: right; margin-top: 10px; color: #999; font-size: 12px; }
+.loading { text-align: center; font-size: 18px; color: var(--primary-color); display: none; margin: 20px 0; }
+
+/* D3 Styling */
+.bar { 
+    fill: url(#barGradient); /* Use gradient */
+    rx: 0; ry: 0; 
+    filter: drop-shadow(0px 1px 2px rgba(0,0,0,0.1));
+} 
+.name-label { 
+    font-size: 12px; 
+    fill: #2d3436; 
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    text-anchor: end; 
+    pointer-events: none; 
+    alignment-baseline: central; 
+}
+.value-label {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 700;
+    font-size: 11px;
+    fill: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.axis text { 
+    font-size: 10px; 
+    fill: #999; 
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 500;
+}
+.axis line { stroke: #eee; }
+.axis path { display: none; } /* Hide axis line */
+
+/* Tooltip */
+.tooltip {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(0,0,0,0.08);
+    color: #333;
+    padding: 14px;
+    border-radius: 12px;
+    pointer-events: none;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    font-size: 13px;
+    display: none;
+    z-index: 3000;
+    line-height: 1.6;
+    backdrop-filter: blur(4px);
+    font-family: 'Inter', 'Noto Sans SC', sans-serif;
+    min-width: 180px; 
+    transition: opacity 0.15s;
+}
+.tooltip-header {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eee;
+    color: #111;
+}
+.tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+.tooltip-row span:last-child {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 600;
+}
